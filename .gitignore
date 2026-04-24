@@ -1,0 +1,34 @@
+# Credentials and environment
+.env
+.env.*
+*.pem
+*.key
+
+# AI tool configuration (contains local paths)
+.claude/.env
+
+# OS and editor metadata
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Dependencies (installed, not committed)
+node_modules/
+vendor/
+__pycache__/
+
+# Build output
+dist/
+build/
+.next/
+.vite/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
