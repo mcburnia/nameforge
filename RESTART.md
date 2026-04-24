@@ -151,15 +151,22 @@ MVP connectors: RDAP (live), INPI company (stub), Companies House (stub), INPI t
   - `api/` scaffold: Fastify 5, Zod-validated env, Vitest, `GET /health` with passing test
   - `web/` scaffold: React 18, Vite 5, Tailwind with brand palette, `/api` proxy to nmf-api
   - Docker Compose stack (`nmf-db` Postgres 16, `nmf-api`, `nmf-web`) on ports 5434/3002/5174
+- **Stage 1 — foundation** (2026-04-24):
+  - Prisma 6.x schema with enums (Jurisdiction, CheckType, ResultStatus) and models (SearchRequest, SearchResult, Finding, EvidenceRecord)
+  - Initial migration `20260424072224_init` applied to `nmf-db`
+  - Shared PrismaClient singleton at `api/src/lib/prisma.ts`
+  - `DATABASE_URL` required in validated env schema
+  - `pnpm db:*` scripts (migrate, generate, seed, reset, studio)
+  - Idempotent seed: sample CRANIS2 search with 2 results, 2 findings, 2 evidence records
 
 ## Known Issues
 
 - Jira project NMF still to be created on lomancavendish.atlassian.net (not blocking local development).
-- No data model yet. Prisma schema, migrations, and domain tables land in Stage 1.
+- Prisma pinned to 6.x (not 7.x) due to an ESM/CJS `require()` bug in `@prisma/dev` on Node 20. Revisit when Prisma 7 patches land.
 - No real connectors yet. Adapter interfaces and in-memory stubs are Stage 2.
 
 ## Current Status
 
-**Stage 0 complete. Ready for Stage 1 (foundation).**
+**Stage 1 complete. Ready for Stage 2 (core services).**
 
-Next session: Prisma schema for `SearchRequest`, `SearchResult`, `Finding`, `EvidenceRecord` plus enums (`Jurisdiction`, `CheckType`, `ResultStatus`), initial migration, and a seed script. Then Stage 2 begins the adapter interfaces, similarity/normalisation/scoring services, and in-memory connector stubs — each with unit tests — per `PROMPT_PACK.md` §14.
+Next session: per `PROMPT_PACK.md` §14 — name normalisation, similarity (Levenshtein + Jaro-Winkler), risk scoring, Zod request validation, and the `AvailabilityConnector` interface with in-memory stubs for DOMAIN/COMPANY/TRADEMARK. Each service lands with unit tests.

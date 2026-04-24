@@ -6,9 +6,18 @@ Authoritative backlog lives in Jira project NMF on lomancavendish.atlassian.net.
 
 ## In Progress
 
-- Stage 1 foundation — Prisma schema and initial migration
+- Stage 2 — core services (normalisation, similarity, risk scoring, Zod validation, connector interface + stubs)
 
 ## Completed
+
+### Stage 1 — Foundation
+
+- [x] Prisma schema (enums, SearchRequest, SearchResult, Finding, EvidenceRecord) with `nmf_`-prefixed tables, UUID PKs, cascade deletes, indexed FKs
+- [x] Initial migration `20260424072224_init` applied to `nmf-db`
+- [x] Shared PrismaClient at `api/src/lib/prisma.ts`
+- [x] `DATABASE_URL` in validated env schema
+- [x] `pnpm db:*` scripts (migrate, migrate:deploy, generate, seed, reset, studio)
+- [x] Idempotent seed producing sample CRANIS2 search with 2 results, 2 findings, 2 evidence records
 
 ### Stage 0 — Setup
 
