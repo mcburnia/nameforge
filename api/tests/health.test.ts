@@ -35,7 +35,7 @@ describe('GET /health', () => {
     expect(() => new Date(body.timestamp)).not.toThrow();
     expect(body.connectors.domain).toMatch(/^(stub|rdap)$/);
     expect(body.connectors.company.UK).toMatch(/^(registry-stub|companies-house)$/);
-    expect(body.connectors.company.FR).toBe('registry-stub');
+    expect(body.connectors.company.FR).toMatch(/^(registry-stub|recherche-entreprises)$/);
     expect(body.connectors.company.EU).toBe('registry-stub');
     expect(body.connectors.trademark).toBe('stub');
   });

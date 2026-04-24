@@ -24,6 +24,18 @@ const envSchema = z.object({
     .default('https://api.company-information.service.gov.uk'),
   COMPANIES_HOUSE_TIMEOUT_MS: z.coerce.number().int().positive().default(8_000),
   COMPANIES_HOUSE_CACHE_TTL_MS: z.coerce.number().int().positive().default(60 * 60 * 1000),
+
+  // French company register (INPI / RNE + SIRENE) via the keyless public API
+  // at https://recherche-entreprises.api.gouv.fr. Opt-in because a fresh
+  // clone should stay offline and deterministic by default; set
+  // FR_REGISTRY_CONNECTOR=recherche-entreprises to enable live FR lookups.
+  FR_REGISTRY_CONNECTOR: z.enum(['stub', 'recherche-entreprises']).default('stub'),
+  RECHERCHE_ENTREPRISES_BASE_URL: z
+    .string()
+    .url()
+    .default('https://recherche-entreprises.api.gouv.fr'),
+  RECHERCHE_ENTREPRISES_TIMEOUT_MS: z.coerce.number().int().positive().default(8_000),
+  RECHERCHE_ENTREPRISES_CACHE_TTL_MS: z.coerce.number().int().positive().default(60 * 60 * 1000),
 });
 
 export type Env = z.infer<typeof envSchema>;

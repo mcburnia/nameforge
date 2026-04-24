@@ -9,6 +9,7 @@ import { createRdapBootstrap } from './modules/domains/rdap.bootstrap.js';
 import type { RegistryConnector } from './modules/registries/registry.adapter.js';
 import { createRegistryStubConnector } from './modules/registries/registry.stub.js';
 import { createCompaniesHouseConnector } from './modules/registries/companies-house.adapter.js';
+import { createRechercheEntreprisesConnector } from './modules/registries/recherche-entreprises.adapter.js';
 import { createRegistryDispatch } from './modules/registries/registry.dispatch.js';
 import { createTrademarkStubConnector } from './modules/trademarks/trademark.stub.js';
 import { createSearchService, type SearchService } from './modules/search/search.service.js';
@@ -67,6 +68,17 @@ function buildDefaultRegistryConnector(): {
     });
     byJurisdiction.UK = companiesHouse;
     names.UK = companiesHouse.name;
+  }
+
+  if (env.FR_REGISTRY_CONNECTOR === 'recherche-entreprises') {
+    const re = createRechercheEntreprisesConnector({
+      fetch: globalThis.fetch.bind(globalThis),
+      baseUrl: env.RECHERCHE_ENTREPRISES_BASE_URL,
+      timeoutMs: env.RECHERCHE_ENTREPRISES_TIMEOUT_MS,
+      cacheTtlMs: env.RECHERCHE_ENTREPRISES_CACHE_TTL_MS,
+    });
+    byJurisdiction.FR = re;
+    names.FR = re.name;
   }
 
   const connector = createRegistryDispatch({
