@@ -172,6 +172,16 @@ MVP connectors: RDAP (live), INPI company (stub), Companies House (stub), INPI t
   - `reports/disclaimer.ts` + Markdown and JSON exporters; disclaimer enforced at the exporter. Markdown escapes metacharacters in user-supplied fields
   - `reports/report.routes.ts`: `GET /api/searches/:id/report.md` (text/markdown) and `GET /api/searches/:id/report.json` (wrapped with `format: 'nameforge.report.v1'` and disclaimer)
   - 37 new tests, 99 total; 3 integration tests run end-to-end against `nmf-db` and clean up after themselves
+- **Stage 4 — frontend MVP** (2026-04-24):
+  - Shared DTO types and `DISCLAIMER` mirrored from backend; typed API client with `ApiError`
+  - `SearchForm` with client-side validation matching the Zod rules, toggle chips for jurisdictions and checks, conditional TLD field
+  - Presentation components: `RiskBadge`, `StatusBadge`, `DisclaimerFooter`, `ResultCard`, `ResultsDashboard`
+  - Pages and routing: `SearchPage` at `/`, `ResultsPage` at `/searches/:id` with loading/ready/not-found/error states
+  - Markdown and JSON download buttons on the results view
+  - Port 5180 (host) for `nmf-web` to avoid collision with other local projects
+  - `VITE_API_PROXY_TARGET` env var so the Vite dev proxy works both inside Docker (`http://nmf-api:3002`) and on the host (`http://localhost:3002` default)
+  - `prisma generate` baked into `api/Dockerfile` so the `@prisma/client` import resolves inside the container
+  - Verified end-to-end: browser loads the SPA at `localhost:5180`, POST/GET through the proxy, Markdown and JSON reports download cleanly
 
 ## Known Issues
 
@@ -179,9 +189,10 @@ MVP connectors: RDAP (live), INPI company (stub), Companies House (stub), INPI t
 - Prisma pinned to 6.x (not 7.x) due to an ESM/CJS `require()` bug in `@prisma/dev` on Node 20. Revisit when Prisma 7 patches land.
 - Registry stub uses a character-position overlap ratio as its internal similarity proxy; the shared `similarityScore()` will replace it when the adapters move from stubs to live clients.
 - Integration tests require `nmf-db` to be running (`docker compose up -d nmf-db`). Test-database isolation (separate `nameforge_test` schema) deferred until the suite is large enough to warrant it.
+- No frontend unit tests yet — component tests with `@testing-library/react` + `jsdom` are a deferred Stage 4.1 task. End-to-end sanity checked manually via `docker compose up` and curl.
 
 ## Current Status
 
-**Stage 3 complete. Ready for Stage 4 (frontend MVP).**
+**Stage 4 complete. Ready for Stage 5 (first live connector).**
 
-Next session: replace the Stage 0 placeholder card with a working search page — name input, jurisdiction and check-type selectors, TLD list, submit to `POST /api/searches`, then render the `SearchReport` returned by `GET /api/searches/:id` grouped by check type. Include the evidence detail view, per-finding risk reason, overall risk score/level, download links for `/report.md` and `/report.json`, and the disclaimer on every results view.
+Next session: RDAP domain connector with caching by `(connector, normalised input)` and graceful degradation when RDAP returns non-200 or rate-limits. Integration tests against a known-registered domain and a known-free domain. After that, INPI / Companies House / EUIPO live connectors follow the same pattern.

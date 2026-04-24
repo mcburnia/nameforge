@@ -6,9 +6,24 @@ Authoritative backlog lives in Jira project NMF on lomancavendish.atlassian.net.
 
 ## In Progress
 
-- Stage 4 — frontend MVP (search form, results dashboard, evidence detail view, disclaimer footer, export download links)
+- Stage 5 — first live connector (RDAP domain connector with caching and graceful degradation)
 
 ## Completed
+
+### Stage 4 — Frontend MVP
+
+- [x] Shared DTO types (`web/src/lib/types.ts`) mirroring backend `SearchReport`
+- [x] `DISCLAIMER` constant in web mirroring the backend
+- [x] Typed API client (`createSearch`, `getSearchReport`, `reportMarkdownUrl`, `reportJsonUrl`) with `ApiError`
+- [x] `SearchForm` with client-side validation matching Zod rules, toggle chips for jurisdictions and checks, TLD field visible only when DOMAIN is selected
+- [x] `ResultsDashboard` with overall `RiskBadge`, grouped results, per-finding risk reason, evidence detail (source, retrieved-at, summary, raw reference, optional sourceUrl)
+- [x] `RiskBadge`, `StatusBadge`, `DisclaimerFooter` presentation components
+- [x] `SearchPage` (`/`) and `ResultsPage` (`/searches/:id`) via React Router with loading, ready, not-found, and error states
+- [x] Markdown and JSON export download buttons on results view
+- [x] End-to-end verified via `docker compose up`: POST proxied through Vite to `nmf-api`, persisted, GET returns aggregated report, both exports work
+- [x] Fixed: port 5174 collision with another local project → bumped to 5180
+- [x] Fixed: Prisma client not generated inside `nmf-api` container → added `prisma generate` to Dockerfile
+- [x] Fixed: Vite proxy target hardcoded to `localhost` → now env-driven (`VITE_API_PROXY_TARGET`) so it works both in Docker and on the host
 
 ### Stage 3 — Search API
 
