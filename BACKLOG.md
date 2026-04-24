@@ -6,10 +6,20 @@ Authoritative backlog lives in Jira project NMF on lomancavendish.atlassian.net.
 
 ## In Progress
 
-- INPI (France) company and trademark connectors — live
-- EUIPO trademark connector — live
+- EUIPO trademark connector — live (and an INPI trademark option once a provider is selected)
 
 ## Completed
+
+### Stage 7 — France (INPI/RNE company register)
+
+- [x] `createRechercheEntreprisesConnector` implementing `RegistryConnector` against the keyless French government API `https://recherche-entreprises.api.gouv.fr` (wraps INPI RNE + SIRENE)
+- [x] Filters active entries only (`etat_administratif === 'A'`); ceased ones excluded
+- [x] Uses shared `similarityScore` + `TtlCache`, graceful 429/5xx/network degradation
+- [x] Evidence includes clickable `annuaire-entreprises.data.gouv.fr/entreprise/{SIREN}` URLs
+- [x] `FR_REGISTRY_CONNECTOR=stub|recherche-entreprises` (default `stub`); `/health` reports active FR backend
+- [x] End-to-end verified: `carrefour` against FR live → 3 exact matches with SIREN attribution; junk name → AVAILABLE
+- [x] 12 new unit tests (154 total)
+- [ ] **French trademark live** — no free production API; stays on the stub. Revisit when selecting a paid INPI/Pappers provider
 
 ### Stage 6 — Companies House (UK)
 
