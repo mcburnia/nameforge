@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "SessionEnd": [
+      {
+        "type": "command",
+        "command": "./scripts/capture-session.sh",
+        "timeout": 10000
+      }
+    ]
+  }
+}
