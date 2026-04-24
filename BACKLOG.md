@@ -6,9 +6,22 @@ Authoritative backlog lives in Jira project NMF on lomancavendish.atlassian.net.
 
 ## In Progress
 
-- Stage 2 — core services (normalisation, similarity, risk scoring, Zod validation, connector interface + stubs)
+- Stage 3 — search API (POST/GET endpoints, Markdown and JSON exporters, disclaimer enforcement)
 
 ## Completed
+
+### Stage 2 — Core Services
+
+- [x] `AvailabilityConnector<TReq,TRes>` interface + per-source adapter types
+- [x] In-memory stubs for DOMAIN (`domain.stub.ts`), COMPANY (`registry.stub.ts`), TRADEMARK (`trademark.stub.ts`) with seed data (Cranis Limited UK, Cranisoft SAS FR, CRANIS EU trademark classes [9, 42])
+- [x] `normaliseName()` — NFD accent strip, lowercase, whitespace/hyphen/underscore collapse, symbol strip
+- [x] `levenshteinDistance` + `levenshteinSimilarity` (hand-rolled DP, rolling rows)
+- [x] `jaroSimilarity` + `jaroWinklerSimilarity` (Winkler 1990 reference)
+- [x] `similarityScore` — max of Levenshtein and Jaro-Winkler
+- [x] `scoreFromContributions` — explainable rules-based scoring with defensive array copy, 0–100 clamp, banded levels (LOW / LOW_MODERATE / MODERATE / HIGH / CRITICAL)
+- [x] `RISK_WEIGHTS` — named constants for exact/similar matches, jurisdiction bonus, class overlap, domain unavailability, low-confidence penalty
+- [x] `CreateSearchRequestSchema` — Zod validation with TLD regex, length caps, non-empty arrays, uniqueness, and DOMAIN-requires-TLDs rule
+- [x] 61 new unit tests (62 total including the health endpoint test)
 
 ### Stage 1 — Foundation
 

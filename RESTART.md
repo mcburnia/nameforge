@@ -158,15 +158,23 @@ MVP connectors: RDAP (live), INPI company (stub), Companies House (stub), INPI t
   - `DATABASE_URL` required in validated env schema
   - `pnpm db:*` scripts (migrate, generate, seed, reset, studio)
   - Idempotent seed: sample CRANIS2 search with 2 results, 2 findings, 2 evidence records
+- **Stage 2 — core services** (2026-04-24):
+  - `AvailabilityConnector<TReq,TRes>` base interface + adapter types and in-memory stubs for DOMAIN, COMPANY, TRADEMARK
+  - Deterministic name normalisation (NFD accent strip, lowercase, whitespace/hyphen/symbol strip)
+  - Hand-rolled similarity engine — Levenshtein (DP with rolling rows) + Jaro-Winkler (Winkler 1990) + composite `similarityScore = max(…)`
+  - Explainable risk scoring — `RiskContribution[]` summed, rounded, clamped to [0,100], mapped to bands; named `RISK_WEIGHTS` constants for tuning
+  - Zod `CreateSearchRequestSchema` with TLD regex, length caps, uniqueness and DOMAIN-requires-TLDs rules
+  - 62 passing unit tests across connectors, normalisation, similarity, scoring, schema, and the health endpoint
 
 ## Known Issues
 
 - Jira project NMF still to be created on lomancavendish.atlassian.net (not blocking local development).
 - Prisma pinned to 6.x (not 7.x) due to an ESM/CJS `require()` bug in `@prisma/dev` on Node 20. Revisit when Prisma 7 patches land.
-- No real connectors yet. Adapter interfaces and in-memory stubs are Stage 2.
+- Registry stub uses a character-position overlap ratio as its internal similarity proxy; the shared `similarityScore()` will replace it when Stage 3 wires services together.
+- No API endpoints for search yet — `POST /api/searches`, `GET /api/searches/:id`, and the Markdown/JSON exporters land in Stage 3.
 
 ## Current Status
 
-**Stage 1 complete. Ready for Stage 2 (core services).**
+**Stage 2 complete. Ready for Stage 3 (search API).**
 
-Next session: per `PROMPT_PACK.md` §14 — name normalisation, similarity (Levenshtein + Jaro-Winkler), risk scoring, Zod request validation, and the `AvailabilityConnector` interface with in-memory stubs for DOMAIN/COMPANY/TRADEMARK. Each service lands with unit tests.
+Next session: wire the search module — `POST /api/searches` dispatches to the connector stubs, persists `SearchRequest`, `SearchResult`, `Finding`, and `EvidenceRecord` through Prisma, and `GET /api/searches/:id` returns the aggregated report with `overallRiskScore` and `overallRiskLevel`. Then Markdown and JSON exporters (`/report.md`, `/report.json`) including the "not legal advice" disclaimer enforced at the exporter.
