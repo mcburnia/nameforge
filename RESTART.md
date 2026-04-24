@@ -165,16 +165,23 @@ MVP connectors: RDAP (live), INPI company (stub), Companies House (stub), INPI t
   - Explainable risk scoring — `RiskContribution[]` summed, rounded, clamped to [0,100], mapped to bands; named `RISK_WEIGHTS` constants for tuning
   - Zod `CreateSearchRequestSchema` with TLD regex, length caps, uniqueness and DOMAIN-requires-TLDs rules
   - 62 passing unit tests across connectors, normalisation, similarity, scoring, schema, and the health endpoint
+- **Stage 3 — search API** (2026-04-24):
+  - `search.service.ts` with dependency-injected connectors for testability; `createSearch` dispatches to stubs, maps through the scoring mapper, persists the nested graph in a single Prisma call; `getSearchReport` fetches and builds the DTO with `overallRiskScore` (clamped sum) and `overallRiskLevel`
+  - `scoring-mapper.ts` with pure `mapDomainResult` / `mapRegistryResult` / `mapTrademarkResult` that apply `RISK_WEIGHTS` and preserve explainable `RiskContribution[]` per result
+  - `search.routes.ts`: `POST /api/searches` (201 with synchronous completion) and `GET /api/searches/:id` (404 via `SearchNotFoundError`)
+  - `reports/disclaimer.ts` + Markdown and JSON exporters; disclaimer enforced at the exporter. Markdown escapes metacharacters in user-supplied fields
+  - `reports/report.routes.ts`: `GET /api/searches/:id/report.md` (text/markdown) and `GET /api/searches/:id/report.json` (wrapped with `format: 'nameforge.report.v1'` and disclaimer)
+  - 37 new tests, 99 total; 3 integration tests run end-to-end against `nmf-db` and clean up after themselves
 
 ## Known Issues
 
 - Jira project NMF still to be created on lomancavendish.atlassian.net (not blocking local development).
 - Prisma pinned to 6.x (not 7.x) due to an ESM/CJS `require()` bug in `@prisma/dev` on Node 20. Revisit when Prisma 7 patches land.
-- Registry stub uses a character-position overlap ratio as its internal similarity proxy; the shared `similarityScore()` will replace it when Stage 3 wires services together.
-- No API endpoints for search yet — `POST /api/searches`, `GET /api/searches/:id`, and the Markdown/JSON exporters land in Stage 3.
+- Registry stub uses a character-position overlap ratio as its internal similarity proxy; the shared `similarityScore()` will replace it when the adapters move from stubs to live clients.
+- Integration tests require `nmf-db` to be running (`docker compose up -d nmf-db`). Test-database isolation (separate `nameforge_test` schema) deferred until the suite is large enough to warrant it.
 
 ## Current Status
 
-**Stage 2 complete. Ready for Stage 3 (search API).**
+**Stage 3 complete. Ready for Stage 4 (frontend MVP).**
 
-Next session: wire the search module — `POST /api/searches` dispatches to the connector stubs, persists `SearchRequest`, `SearchResult`, `Finding`, and `EvidenceRecord` through Prisma, and `GET /api/searches/:id` returns the aggregated report with `overallRiskScore` and `overallRiskLevel`. Then Markdown and JSON exporters (`/report.md`, `/report.json`) including the "not legal advice" disclaimer enforced at the exporter.
+Next session: replace the Stage 0 placeholder card with a working search page — name input, jurisdiction and check-type selectors, TLD list, submit to `POST /api/searches`, then render the `SearchReport` returned by `GET /api/searches/:id` grouped by check type. Include the evidence detail view, per-finding risk reason, overall risk score/level, download links for `/report.md` and `/report.json`, and the disclaimer on every results view.

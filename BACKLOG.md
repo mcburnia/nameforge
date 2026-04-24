@@ -6,9 +6,20 @@ Authoritative backlog lives in Jira project NMF on lomancavendish.atlassian.net.
 
 ## In Progress
 
-- Stage 3 — search API (POST/GET endpoints, Markdown and JSON exporters, disclaimer enforcement)
+- Stage 4 — frontend MVP (search form, results dashboard, evidence detail view, disclaimer footer, export download links)
 
 ## Completed
+
+### Stage 3 — Search API
+
+- [x] `POST /api/searches` — validates with `CreateSearchRequestSchema`, runs stubs synchronously, persists nested graph via single Prisma call, returns `{ searchId, status: 'COMPLETED' }`
+- [x] `GET /api/searches/:id` — returns `SearchReport` DTO with per-result findings, evidence, and `overallRiskScore` / `overallRiskLevel`
+- [x] Scoring mapper converts connector results into explainable `RiskContribution[]` per check type (domain unavailability, exact/similar company/trademark, NICE class overlap, same-jurisdiction bonus)
+- [x] `GET /api/searches/:id/report.md` — Markdown exporter with metacharacter escaping and disclaimer footer
+- [x] `GET /api/searches/:id/report.json` — JSON exporter with `nameforge.report.v1` format marker and disclaimer
+- [x] Shared `DISCLAIMER` constant enforced at the exporter, not the UI
+- [x] Integration tests against real `nmf-db` verify POST persists 9 results for 3 TLDs × 3 jurisdictions × 2 checks, GET aggregates risk correctly, and 404 on unknown id
+- [x] 37 new unit tests (99 total)
 
 ### Stage 2 — Core Services
 
