@@ -6,6 +6,7 @@ import { createRegistryStubConnector } from './modules/registries/registry.stub.
 import { createTrademarkStubConnector } from './modules/trademarks/trademark.stub.js';
 import { createSearchService, type SearchService } from './modules/search/search.service.js';
 import { searchRoutes } from './modules/search/search.routes.js';
+import { reportRoutes } from './modules/reports/report.routes.js';
 
 export interface BuildAppOptions {
   logger?: boolean;
@@ -37,6 +38,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   }));
 
   await app.register(searchRoutes, { searchService });
+  await app.register(reportRoutes, { searchService });
 
   return app;
 }
