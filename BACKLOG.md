@@ -6,9 +6,23 @@ Authoritative backlog lives in Jira project NMF on lomancavendish.atlassian.net.
 
 ## In Progress
 
-- Stage 5 — first live connector (RDAP domain connector with caching and graceful degradation)
+- INPI (France) company and trademark connectors — live
+- Companies House (UK) connector — live
+- EUIPO trademark connector — live
 
 ## Completed
+
+### Stage 5 — First Live Connector
+
+- [x] Generic TTL cache with injectable clock, max-entries cap, expired-first eviction
+- [x] IANA RDAP bootstrap loader (RFC 7484) with HTTPS preference, concurrent-load dedup, 24h TTL
+- [x] Live RDAP domain connector implementing `DomainConnector`: 200→UNAVAILABLE (extracts registrar + dates), 404→AVAILABLE, 429→UNKNOWN with retry-after, 5xx→ERROR, timeout/network→ERROR, unknown TLD→UNKNOWN without fetch
+- [x] Caches AVAILABLE/UNAVAILABLE by fqdn; does not cache transient failures
+- [x] `DOMAIN_CONNECTOR` env flag (`stub` | `rdap`), default `stub` so fresh clone works offline
+- [x] `GET /health` reports active connectors
+- [x] `vitest setupFiles` loads `api/.env` so env-importing app.ts works in tests without dotenv dependency
+- [x] End-to-end verified against real RDAP: `example.com` → UNAVAILABLE with IANA registrar evidence, `nameforge-liveprobe-9f4c2b.com` → AVAILABLE with RFC 7480 §5.3 note
+- [x] 27 new unit tests (126 total)
 
 ### Stage 4 — Frontend MVP
 

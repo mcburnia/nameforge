@@ -182,17 +182,26 @@ MVP connectors: RDAP (live), INPI company (stub), Companies House (stub), INPI t
   - `VITE_API_PROXY_TARGET` env var so the Vite dev proxy works both inside Docker (`http://nmf-api:3002`) and on the host (`http://localhost:3002` default)
   - `prisma generate` baked into `api/Dockerfile` so the `@prisma/client` import resolves inside the container
   - Verified end-to-end: browser loads the SPA at `localhost:5180`, POST/GET through the proxy, Markdown and JSON reports download cleanly
+- **Stage 5 — first live connector (RDAP domain)** (2026-04-24):
+  - Generic `TtlCache<T>` in `modules/cache/` with injectable clock (deterministic tests), max-entries guard, expired-first then oldest eviction
+  - `createRdapBootstrap` fetches the IANA RFC 7484 registry once per 24h, prefers HTTPS when a TLD lists both, dedupes concurrent first-loads
+  - `createRdapDomainConnector` implements `DomainConnector`: 200→UNAVAILABLE (extracts registrar from vcardArray, registration and expiration dates from `events`), 404→AVAILABLE (RFC 7480 §5.3), 429→UNKNOWN with retry-after, 5xx/timeout/network→ERROR, unknown TLD→UNKNOWN without network call. Caches terminal outcomes; transient failures retry on next request
+  - Env-flag wiring via `DOMAIN_CONNECTOR` (`stub` default, `rdap` opt-in). `buildDefaultDomainConnector()` picks by env and shares `globalThis.fetch`
+  - `GET /health` reports which connector is active for each source type
+  - `vitest setupFiles` loads `api/.env` before `src/config/env.ts` runs; no dotenv dependency
+  - Verified live end-to-end with `DOMAIN_CONNECTOR=rdap`: `example.com` → UNAVAILABLE with IANA registrar evidence, a random junk name → AVAILABLE with RFC 7480 §5.3 note
 
 ## Known Issues
 
 - Jira project NMF still to be created on lomancavendish.atlassian.net (not blocking local development).
 - Prisma pinned to 6.x (not 7.x) due to an ESM/CJS `require()` bug in `@prisma/dev` on Node 20. Revisit when Prisma 7 patches land.
-- Registry stub uses a character-position overlap ratio as its internal similarity proxy; the shared `similarityScore()` will replace it when the adapters move from stubs to live clients.
+- Registry and trademark stubs use a character-position overlap ratio as their internal similarity proxy; the shared `similarityScore()` will replace it when the live company / trademark connectors land.
 - Integration tests require `nmf-db` to be running (`docker compose up -d nmf-db`). Test-database isolation (separate `nameforge_test` schema) deferred until the suite is large enough to warrant it.
 - No frontend unit tests yet — component tests with `@testing-library/react` + `jsdom` are a deferred Stage 4.1 task. End-to-end sanity checked manually via `docker compose up` and curl.
+- RDAP cache is in-process only. A Redis-backed or Prisma-backed cache replaces `TtlCache` when we need horizontal scale or cross-process sharing.
 
 ## Current Status
 
-**Stage 4 complete. Ready for Stage 5 (first live connector).**
+**Stage 5 complete — RDAP live. Stubs still drive company and trademark checks.**
 
-Next session: RDAP domain connector with caching by `(connector, normalised input)` and graceful degradation when RDAP returns non-200 or rate-limits. Integration tests against a known-registered domain and a known-free domain. After that, INPI / Companies House / EUIPO live connectors follow the same pattern.
+Next sessions tackle the remaining live connectors one at a time behind the same adapter pattern and env-flag wiring: Companies House (UK), INPI (France) for both company and trademark, and EUIPO for EU trademarks. Each brings its own auth model (Companies House needs an API key, INPI is open, EUIPO has a public search API), so each gets its own `{SOURCE}_CONNECTOR` env flag with `stub` as the default.
