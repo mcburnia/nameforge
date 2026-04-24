@@ -6,17 +6,22 @@ Authoritative backlog lives in Jira project NMF on lomancavendish.atlassian.net.
 
 ## In Progress
 
-- Project kickoff — documentation scaffold complete; implementation not yet started
+- Stage 1 foundation — Prisma schema and initial migration
 
-## Next Up (MVP)
+## Completed
 
 ### Stage 0 — Setup
 
-- Create Jira project NMF on lomancavendish.atlassian.net
-- Create `.claude/hooks.json` and `.claude/.env` for session capture
-- Verify evidence repository exists and is a valid git repo
-- Initialise monorepo structure (`api/`, `web/`, `docker-compose.yml`, root `package.json`)
-- Add `.gitignore` with credential exclusions per PROJECT-SCAFFOLD.md §8
+- [x] Session capture wired (`.claude/hooks.json`, `.claude/.env`, `scripts/capture-session.sh`)
+- [x] Dedicated evidence repo at `/Users/andimcburnie/nameforge-evidence` (independent of PIICII / KeepUsHonest)
+- [x] Monorepo structure with pnpm workspaces (`api/`, `web/`, root `package.json`, `pnpm-workspace.yaml`)
+- [x] `.gitignore` with credential exclusions per PROJECT-SCAFFOLD.md §8 (and `.env.example` allowance)
+- [x] `api/` scaffold: Fastify 5 + TypeScript strict + Zod env + Vitest + `GET /health`
+- [x] `web/` scaffold: React 18 + Vite 5 + Tailwind + brand palette + disclaimer footer
+- [x] Docker Compose with `nmf-db` (Postgres 16), `nmf-api`, `nmf-web` on ports 5434/3002/5174
+- [ ] Jira project NMF on lomancavendish.atlassian.net — **deferred (requires human action)**
+
+## Next Up (MVP)
 
 ### Stage 1 — Foundation
 

@@ -144,15 +144,22 @@ MVP connectors: RDAP (live), INPI company (stub), Companies House (stub), INPI t
 - Product brief, architecture prompt, domain model, API contract, risk scoring rules, similarity engine outline, connector design, non-functional and security requirements, compliance/disclaimer requirement, initial epics, and first implementation task captured in `PROMPT_PACK.md` (2026-04-24)
 - Loman Cavendish framework docs (Principles, Policy, Standards, Guidelines, Project-Scaffold) copied into `scaffold/` (2026-04-24)
 - `CLAUDE.md`, `RESTART.md`, `BACKLOG.md`, `SESSION.md` initialised (2026-04-24)
+- **Stage 0 — setup** (2026-04-24):
+  - Session capture wired (`.claude/hooks.json`, `.claude/.env`, `scripts/capture-session.sh`)
+  - Dedicated evidence repo at `/Users/andimcburnie/nameforge-evidence` (independent of other projects)
+  - pnpm workspace established (`api/`, `web/`), Node 20 pinned via `.nvmrc`
+  - `api/` scaffold: Fastify 5, Zod-validated env, Vitest, `GET /health` with passing test
+  - `web/` scaffold: React 18, Vite 5, Tailwind with brand palette, `/api` proxy to nmf-api
+  - Docker Compose stack (`nmf-db` Postgres 16, `nmf-api`, `nmf-web`) on ports 5434/3002/5174
 
 ## Known Issues
 
-- No code yet. Repository is documentation-only at this point.
-- Jira project NMF must be created on lomancavendish.atlassian.net before work begins.
-- Evidence repository path must be configured in `.claude/.env` before the first capture-enabled session.
+- Jira project NMF still to be created on lomancavendish.atlassian.net (not blocking local development).
+- No data model yet. Prisma schema, migrations, and domain tables land in Stage 1.
+- No real connectors yet. Adapter interfaces and in-memory stubs are Stage 2.
 
 ## Current Status
 
-**Documentation scaffold complete. Implementation not yet started.**
+**Stage 0 complete. Ready for Stage 1 (foundation).**
 
-Next session should execute the "First Implementation Task" in `PROMPT_PACK.md` Section 14: scaffold Docker Compose with PostgreSQL, health endpoint, search API skeleton, in-memory connector stubs, basic risk scoring, React search form, basic results view, and the core unit tests (normalisation, similarity, scoring, request validation). No live external APIs in the first pass.
+Next session: Prisma schema for `SearchRequest`, `SearchResult`, `Finding`, `EvidenceRecord` plus enums (`Jurisdiction`, `CheckType`, `ResultStatus`), initial migration, and a seed script. Then Stage 2 begins the adapter interfaces, similarity/normalisation/scoring services, and in-memory connector stubs — each with unit tests — per `PROMPT_PACK.md` §14.
