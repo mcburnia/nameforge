@@ -1,0 +1,98 @@
+// NameForge — database schema
+// Table names are prefixed `nmf_`. TypeScript uses camelCase; DB columns
+// use snake_case (mapped via @map / @@map).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Jurisdiction {
+  FR
+  UK
+  EU
+}
+
+enum CheckType {
+  DOMAIN
+  COMPANY
+  TRADEMARK
+}
+
+enum ResultStatus {
+  AVAILABLE
+  UNAVAILABLE
+  SIMILAR_FOUND
+  UNKNOWN
+  ERROR
+}
+
+model SearchRequest {
+  id             String         @id @default(uuid())
+  proposedName   String         @map("proposed_name")
+  normalisedName String         @map("normalised_name")
+  jurisdictions  Jurisdiction[]
+  checks         CheckType[]
+  domains        String[]       @default([])
+  createdAt      DateTime       @default(now()) @map("created_at")
+
+  results SearchResult[]
+
+  @@index([normalisedName])
+  @@map("nmf_search_request")
+}
+
+model SearchResult {
+  id              String        @id @default(uuid())
+  searchRequestId String        @map("search_request_id")
+  checkType       CheckType     @map("check_type")
+  jurisdiction    Jurisdiction?
+  source          String
+  status          ResultStatus
+  confidence      Float         @default(1.0)
+  riskScore       Int           @default(0) @map("risk_score")
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  searchRequest SearchRequest    @relation(fields: [searchRequestId], references: [id], onDelete: Cascade)
+  findings      Finding[]
+  evidence      EvidenceRecord[]
+
+  @@index([searchRequestId])
+  @@map("nmf_search_result")
+}
+
+model Finding {
+  id              String   @id @default(uuid())
+  searchResultId  String   @map("search_result_id")
+  title           String
+  description     String
+  matchedName     String?  @map("matched_name")
+  similarityScore Float?   @map("similarity_score")
+  riskReason      String?  @map("risk_reason")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  searchResult SearchResult @relation(fields: [searchResultId], references: [id], onDelete: Cascade)
+
+  @@index([searchResultId])
+  @@map("nmf_finding")
+}
+
+model EvidenceRecord {
+  id             String   @id @default(uuid())
+  searchResultId String   @map("search_result_id")
+  sourceName     String   @map("source_name")
+  sourceUrl      String?  @map("source_url")
+  retrievedAt    DateTime @map("retrieved_at")
+  rawReference   String?  @map("raw_reference")
+  summary        String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  searchResult SearchResult @relation(fields: [searchResultId], references: [id], onDelete: Cascade)
+
+  @@index([searchResultId])
+  @@map("nmf_evidence_record")
+}
