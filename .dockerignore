@@ -1,0 +1,15 @@
+node_modules
+**/node_modules
+dist
+build
+.next
+.vite
+coverage
+.git
+.env
+.env.*
+.claude
+scaffold
+*.md
+!api/README.md
+!web/README.md
