@@ -23,10 +23,14 @@ describe('GET /health', () => {
       service: string;
       version: string;
       timestamp: string;
+      connectors: { domain: string; company: string; trademark: string };
     };
     expect(body.status).toBe('ok');
     expect(body.service).toBe('nmf-api');
     expect(body.version).toBe('0.1.0');
     expect(() => new Date(body.timestamp)).not.toThrow();
+    expect(body.connectors.domain).toMatch(/^(stub|rdap)$/);
+    expect(body.connectors.company).toBe('stub');
+    expect(body.connectors.trademark).toBe('stub');
   });
 });

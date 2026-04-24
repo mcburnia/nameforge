@@ -33,6 +33,10 @@ services:
       PORT: '3002'
       HOST: '0.0.0.0'
       DATABASE_URL: postgresql://${POSTGRES_USER:-nameforge}:${POSTGRES_PASSWORD:-nameforge_dev}@nmf-db:5432/${POSTGRES_DB:-nameforge_dev}
+      DOMAIN_CONNECTOR: ${DOMAIN_CONNECTOR:-stub}
+      RDAP_BOOTSTRAP_URL: ${RDAP_BOOTSTRAP_URL:-https://data.iana.org/rdap/dns.json}
+      RDAP_TIMEOUT_MS: ${RDAP_TIMEOUT_MS:-8000}
+      RDAP_CACHE_TTL_MS: ${RDAP_CACHE_TTL_MS:-3600000}
     ports:
       - '3002:3002'
     volumes:
