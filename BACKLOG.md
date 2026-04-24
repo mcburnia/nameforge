@@ -7,10 +7,20 @@ Authoritative backlog lives in Jira project NMF on lomancavendish.atlassian.net.
 ## In Progress
 
 - INPI (France) company and trademark connectors — live
-- Companies House (UK) connector — live
 - EUIPO trademark connector — live
 
 ## Completed
+
+### Stage 6 — Companies House (UK)
+
+- [x] `createCompaniesHouseConnector` implementing `RegistryConnector` against `https://api.company-information.service.gov.uk/search/companies` with HTTP Basic auth
+- [x] Uses shared `similarityScore` (Levenshtein + Jaro-Winkler) and `TtlCache` — replaces the stub's local overlap proxy for live UK lookups
+- [x] Filters by active company status; dissolved / removed / closed are excluded from matches
+- [x] `createRegistryDispatch` routes per-jurisdiction so UK can go live while FR/EU stay on the stub; `SearchService` unchanged
+- [x] `COMPANIES_HOUSE_API_KEY` opt-in env var — missing key keeps UK on the stub
+- [x] `/health` now reports `connectors.company.{UK, FR, EU}` individually
+- [x] End-to-end verified: without a key everything stays stubbed; with a placeholder key `/health` reports UK → `companies-house` and the adapter correctly rejects the fake credential (401 → UNKNOWN)
+- [x] 16 new unit tests (142 total)
 
 ### Stage 5 — First Live Connector
 

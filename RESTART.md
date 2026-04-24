@@ -190,18 +190,24 @@ MVP connectors: RDAP (live), INPI company (stub), Companies House (stub), INPI t
   - `GET /health` reports which connector is active for each source type
   - `vitest setupFiles` loads `api/.env` before `src/config/env.ts` runs; no dotenv dependency
   - Verified live end-to-end with `DOMAIN_CONNECTOR=rdap`: `example.com` → UNAVAILABLE with IANA registrar evidence, a random junk name → AVAILABLE with RFC 7480 §5.3 note
+- **Stage 6 — Companies House (UK)** (2026-04-24):
+  - `createCompaniesHouseConnector` implements `RegistryConnector` using HTTP Basic auth against `/search/companies`. Uses the shared `similarityScore` (Levenshtein + Jaro-Winkler) and `TtlCache`; filters active statuses only; ranks by score and caps at `maxMatches`
+  - `createRegistryDispatch` routes per-jurisdiction: UK can be live while FR/EU stay on the stub. Rewrites `result.source` to the selected connector name so stored evidence references the right upstream. `SearchService` still depends on a single `RegistryConnector`
+  - Opt-in env var `COMPANIES_HOUSE_API_KEY` — missing key keeps UK on the stub. `COMPANIES_HOUSE_BASE_URL`, `COMPANIES_HOUSE_TIMEOUT_MS`, `COMPANIES_HOUSE_CACHE_TTL_MS` configurable
+  - `GET /health` now nests company connectors by jurisdiction: `{ domain, company: { UK, FR, EU }, trademark }`
+  - Verified end-to-end: no key → everything stubbed; placeholder key → `/health` reports `company.UK = companies-house`, POST with UK+FR routes UK through Companies House (401 → UNKNOWN with fake key) and FR through the stub
 
 ## Known Issues
 
 - Jira project NMF still to be created on lomancavendish.atlassian.net (not blocking local development).
 - Prisma pinned to 6.x (not 7.x) due to an ESM/CJS `require()` bug in `@prisma/dev` on Node 20. Revisit when Prisma 7 patches land.
-- Registry and trademark stubs use a character-position overlap ratio as their internal similarity proxy; the shared `similarityScore()` will replace it when the live company / trademark connectors land.
+- Trademark stub still uses a local character-position overlap as its internal similarity proxy — will be replaced by the shared `similarityScore()` when INPI / EUIPO trademark connectors land.
 - Integration tests require `nmf-db` to be running (`docker compose up -d nmf-db`). Test-database isolation (separate `nameforge_test` schema) deferred until the suite is large enough to warrant it.
 - No frontend unit tests yet — component tests with `@testing-library/react` + `jsdom` are a deferred Stage 4.1 task. End-to-end sanity checked manually via `docker compose up` and curl.
-- RDAP cache is in-process only. A Redis-backed or Prisma-backed cache replaces `TtlCache` when we need horizontal scale or cross-process sharing.
+- Live connector caches are in-process only. A Redis-backed or Prisma-backed cache replaces `TtlCache` when we need horizontal scale or cross-process sharing.
 
 ## Current Status
 
-**Stage 5 complete — RDAP live. Stubs still drive company and trademark checks.**
+**Stage 6 complete — Companies House (UK) live behind `COMPANIES_HOUSE_API_KEY`. RDAP live for domains. Stubs still drive FR/EU company lookups and all trademark lookups.**
 
-Next sessions tackle the remaining live connectors one at a time behind the same adapter pattern and env-flag wiring: Companies House (UK), INPI (France) for both company and trademark, and EUIPO for EU trademarks. Each brings its own auth model (Companies House needs an API key, INPI is open, EUIPO has a public search API), so each gets its own `{SOURCE}_CONNECTOR` env flag with `stub` as the default.
+Next sessions: INPI (France) for both company and trademark registers, then EUIPO for EU trademarks. Each lands behind the same adapter + dispatch + env-flag pattern so a fresh clone keeps working offline against stubs.
