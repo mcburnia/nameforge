@@ -1,0 +1,32 @@
+import { describe, expect, it, afterAll, beforeAll } from 'vitest';
+import type { FastifyInstance } from 'fastify';
+import { buildApp } from '../src/app.js';
+
+describe('GET /health', () => {
+  let app: FastifyInstance;
+
+  beforeAll(async () => {
+    app = await buildApp({ logger: false });
+    await app.ready();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('returns status ok with service metadata', async () => {
+    const response = await app.inject({ method: 'GET', url: '/health' });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json() as {
+      status: string;
+      service: string;
+      version: string;
+      timestamp: string;
+    };
+    expect(body.status).toBe('ok');
+    expect(body.service).toBe('nmf-api');
+    expect(body.version).toBe('0.1.0');
+    expect(() => new Date(body.timestamp)).not.toThrow();
+  });
+});
