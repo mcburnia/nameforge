@@ -51,8 +51,9 @@ services:
       - nmf-api
     environment:
       NODE_ENV: development
+      VITE_API_PROXY_TARGET: http://nmf-api:3002
     ports:
-      - '5174:5174'
+      - '5180:5180'
     volumes:
       - ./web/src:/app/web/src
       - ./web/index.html:/app/web/index.html

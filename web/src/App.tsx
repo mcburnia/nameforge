@@ -1,40 +1,53 @@
-export default function App() {
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import { SearchPage } from './pages/SearchPage';
+import { ResultsPage } from './pages/ResultsPage';
+
+function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-full flex flex-col">
       <header className="bg-brand-dark text-white">
-        <div className="max-w-5xl mx-auto px-6 py-6">
-          <h1 className="text-2xl font-bold tracking-tight">
-            Name<span className="text-brand">Forge</span>
-          </h1>
-          <p className="text-sm text-slate-300 mt-1">
-            Name availability intelligence
-          </p>
+        <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
+          <Link to="/" className="flex items-baseline gap-3 hover:opacity-90">
+            <h1 className="text-2xl font-bold tracking-tight">
+              Name<span className="text-brand">Forge</span>
+            </h1>
+            <span className="text-xs text-slate-300 uppercase tracking-wide">
+              Name availability intelligence
+            </span>
+          </Link>
+          <span className="text-xs text-slate-400">Loman Cavendish</span>
         </div>
       </header>
 
       <main className="flex-1">
-        <div className="max-w-5xl mx-auto px-6 py-10">
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Stage 0 scaffold
-            </h2>
-            <p className="mt-2 text-sm text-slate-600">
-              The web app is running. Search form, jurisdiction selector, and
-              results dashboard will land in subsequent stages per{' '}
-              <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">
-                BACKLOG.md
-              </code>
-              .
-            </p>
-          </div>
-
-          <p className="mt-8 text-xs text-slate-500">
-            NameForge provides automated availability intelligence only. It is
-            not legal advice, does not guarantee registrability, and should not
-            replace professional trademark or legal review.
-          </p>
-        </div>
+        <div className="max-w-5xl mx-auto px-6 py-10">{children}</div>
       </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppShell>
+        <Routes>
+          <Route path="/" element={<SearchPage />} />
+          <Route path="/searches/:id" element={<ResultsPage />} />
+          <Route
+            path="*"
+            element={
+              <div className="rounded-lg border border-slate-200 bg-white p-6 text-sm text-slate-700 shadow-sm">
+                <p className="font-semibold">Page not found</p>
+                <p className="mt-1">
+                  <Link to="/" className="text-brand underline">
+                    Back to search
+                  </Link>
+                </p>
+              </div>
+            }
+          />
+        </Routes>
+      </AppShell>
+    </BrowserRouter>
   );
 }

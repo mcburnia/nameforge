@@ -33,7 +33,7 @@ NameForge is a name availability intelligence platform built by Loman Cavendish.
 |---------|------|---------|
 | nmf-db (PostgreSQL) | 5434 | SQL connections (user: nameforge, db: nameforge_dev / nameforge_test) |
 | nmf-api (Fastify) | 3002 | REST API |
-| nmf-web (React/Vite) | 5174 | Frontend dev server |
+| nmf-web (React/Vite) | 5180 | Frontend dev server |
 
 ## Architecture
 

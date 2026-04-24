@@ -13,6 +13,8 @@ COPY api ./api
 
 WORKDIR /app/api
 
+RUN pnpm exec prisma generate
+
 EXPOSE 3002
 
 CMD ["pnpm", "dev"]

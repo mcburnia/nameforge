@@ -13,6 +13,6 @@ COPY web ./web
 
 WORKDIR /app/web
 
-EXPOSE 5174
+EXPOSE 5180
 
 CMD ["pnpm", "dev"]

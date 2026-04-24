@@ -14,7 +14,7 @@ Three-service Docker Compose application:
 
 - **nmf-db** — PostgreSQL 16 (port 5434)
 - **nmf-api** — Fastify REST API with Prisma ORM, TypeScript strict mode (port 3002)
-- **nmf-web** — React SPA with Tailwind CSS, built with Vite (port 5174)
+- **nmf-web** — React SPA with Tailwind CSS, built with Vite (port 5180)
 
 ### Backend Module Layout
 
@@ -150,7 +150,7 @@ MVP connectors: RDAP (live), INPI company (stub), Companies House (stub), INPI t
   - pnpm workspace established (`api/`, `web/`), Node 20 pinned via `.nvmrc`
   - `api/` scaffold: Fastify 5, Zod-validated env, Vitest, `GET /health` with passing test
   - `web/` scaffold: React 18, Vite 5, Tailwind with brand palette, `/api` proxy to nmf-api
-  - Docker Compose stack (`nmf-db` Postgres 16, `nmf-api`, `nmf-web`) on ports 5434/3002/5174
+  - Docker Compose stack (`nmf-db` Postgres 16, `nmf-api`, `nmf-web`) on ports 5434/3002/5180
 - **Stage 1 — foundation** (2026-04-24):
   - Prisma 6.x schema with enums (Jurisdiction, CheckType, ResultStatus) and models (SearchRequest, SearchResult, Finding, EvidenceRecord)
   - Initial migration `20260424072224_init` applied to `nmf-db`
